@@ -9,6 +9,7 @@ class PostForm(ModelForm):
         help_texts = {'group': 'Выберите группу', 'text': 'Введите ссообщение'}
         fields = ['group', 'text', 'image']
 
+
 class CommentForm(ModelForm):
     class Meta:
         model = Comment

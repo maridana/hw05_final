@@ -20,18 +20,19 @@ POST_2: int = 3
 
 settings.MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
 
+
 @override_settings(MEDIA_ROOT=settings.MEDIA_ROOT)
 class TaskPagesTests(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        small_gif = (            
-             b'\x47\x49\x46\x38\x39\x61\x02\x00'
-             b'\x01\x00\x80\x00\x00\x00\x00\x00'
-             b'\xFF\xFF\xFF\x21\xF9\x04\x00\x00'
-             b'\x00\x00\x00\x2C\x00\x00\x00\x00'
-             b'\x02\x00\x01\x00\x00\x02\x02\x0C'
-             b'\x0A\x00\x3B'
+        small_gif = ( 
+            b'\x47\x49\x46\x38\x39\x61\x02\x00'
+            b'\x01\x00\x80\x00\x00\x00\x00\x00'
+            b'\xFF\xFF\xFF\x21\xF9\x04\x00\x00'
+            b'\x00\x00\x00\x2C\x00\x00\x00\x00'
+            b'\x02\x00\x01\x00\x00\x02\x02\x0C'
+            b'\x0A\x00\x3B'
         )
         uploaded = SimpleUploadedFile(
             name='small.gif',
@@ -216,6 +217,7 @@ class PaginatorViewsTest(TestCase):
                 response.context.get('page_obj').object_list),
                 POST_2)
 
+
 class CommentTests(TestCase):
     @classmethod
     def setUpClass(cls):
@@ -235,7 +237,6 @@ class CommentTests(TestCase):
         self.guest_client = Client()
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
-        self.comments = Comment.objects.count()
         cache.clear()
 
     def test_comment_yes(self):
@@ -255,6 +256,7 @@ class CommentTests(TestCase):
             'author': self.user,
             'post': self.post,
         }
+        current_comments_count = Comment.objects.count()
         response = self.authorized_client.post(
             reverse('posts:add_comment', kwargs={
                 'post_id': self.post.id
@@ -270,11 +272,11 @@ class CommentTests(TestCase):
         )
         self.assertEqual(
             Comment.objects.count(),
-            self.comments + 1
+            current_comments_count + 1
         )
         self.assertTrue(
             Comment.objects.filter(
-                text='коммент',
+                text=form_data['text'],
                 author=self.post.author,
                 post=self.post,
             ).exists()
@@ -287,6 +289,7 @@ class CommentTests(TestCase):
             'author': self.user,
             'post': self.post,
         }
+        current_comments_count = Comment.objects.count()
         self.guest_client.post(
             reverse(
                 'posts:add_comment',
@@ -297,15 +300,16 @@ class CommentTests(TestCase):
         )
         self.assertNotEqual(
             Comment.objects.count(),
-            self.comments + 1
+            current_comments_count + 1
         )
         self.assertFalse(
             Comment.objects.filter(
-                text='коммент2',
+                text=form_data['text'],
                 author=self.user,
                 post=self.post,
             ).exists()
         )
+
 
 class CacheTest(TestCase):
     def setUp(self):
@@ -331,6 +335,7 @@ class CacheTest(TestCase):
         content_3 = response.content
         self.assertNotEqual(content_1, content_3)
 
+
 class FollowTests(TestCase):
     @classmethod
     def setUpClass(cls):
@@ -343,7 +348,7 @@ class FollowTests(TestCase):
             author=cls.author,
         )
         cls.post = Post.objects.create(
-            text='Тестовый текст',
+            text='Тестовый текст2',
             author=cls.author,
         )
 
@@ -356,7 +361,7 @@ class FollowTests(TestCase):
         self.not_follower_client.force_login(self.not_follower)
 
     def test_authorized_can_follow_unfollow(self):
-        """Пользователь может подписываться на других и удалять их из подписок."""
+        """Можно подписываться на других и удалять их из подписок."""
         self.follower_client.get(
             reverse(
                 'posts:profile_follow',
@@ -383,7 +388,7 @@ class FollowTests(TestCase):
         )
 
     def test_only_follower_sees_new_post(self):
-        """Новая запись появляется у тех, кто подписан и не появляется у тех, кто не подписан."""
+        """Новая запись у тех, кто подписан, и нет у тех, кто не подписан."""
         self.follower_client.get(
             reverse(
                 'posts:profile_follow',

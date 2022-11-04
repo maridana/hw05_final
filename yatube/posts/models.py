@@ -30,8 +30,9 @@ class Post(models.Model):
     image = models.ImageField(
         'Картинка',
         upload_to='posts/',
-        blank=True    
+        blank=True
     )
+
     def __str__(self):
         return self.text[:POST_S]
 
@@ -46,6 +47,7 @@ class Group(models.Model):
 
     def __str__(self):
         return self.title
+
 
 class Comment(models.Model):
     post = models.ForeignKey(
@@ -65,6 +67,7 @@ class Comment(models.Model):
     )
     created = models.DateTimeField(auto_now_add=True)
 
+
 class Follow(models.Model):
     user = models.ForeignKey(
         User,
@@ -78,11 +81,10 @@ class Follow(models.Model):
         related_name='following',
         verbose_name='Автор поста'
     )
-    
+
     def you_can_follow(user, author):
         follow_exists = Follow.objects.filter(
             author=author,
             user=user
         ).exists()
         return (user != author and not follow_exists)
-
