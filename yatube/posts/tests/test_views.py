@@ -216,30 +216,29 @@ class PaginatorViewsTest(TestCase):
                 response.context.get('page_obj').object_list),
                 POST_2)
 
-class CommentPagesTests(TestCase):
+class CommentTests(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.ADDED_ENTRY = 1
-        cls.author = User.objects.create_user(username='auth3')
+        cls.user = User.objects.create_user(username='auth3')
         cls.post = Post.objects.create(
             text='текст',
-            author=cls.author,
+            author=cls.user,
         )
         cls.comment = Comment.objects.create(
             post=cls.post,
-            author=cls.author,
+            author=cls.user,
             text='коммент',
         )
 
     def setUp(self):
         self.guest_client = Client()
         self.authorized_client = Client()
-        self.authorized_client.force_login(self.author)
-        self.comments_count = Comment.objects.count()
+        self.authorized_client.force_login(self.user)
+        self.comments = Comment.objects.count()
         cache.clear()
 
-    def test_comment_appears(self):
+    def test_comment_yes(self):
         """После отправки коммент появляется."""
         names_pages = [
             reverse('posts:post_detail', kwargs={'post_id': self.post.pk}),
@@ -249,11 +248,11 @@ class CommentPagesTests(TestCase):
             form_obj = response.context.get('comments')[0]
             self.assertEqual(form_obj.text, self.comment.text)
 
-    def test_post_can_comments_authorized_client(self):
+    def test_authorized_can_comment(self):
         """Авторизованный пользователь может комментировать посты."""
         form_data = {
             'text': 'коммент',
-            'author': self.author,
+            'author': self.user,
             'post': self.post,
         }
         response = self.authorized_client.post(
@@ -271,7 +270,7 @@ class CommentPagesTests(TestCase):
         )
         self.assertEqual(
             Comment.objects.count(),
-            self.comments_count + self.ADDED_ENTRY
+            self.comments + 1
         )
         self.assertTrue(
             Comment.objects.filter(
@@ -285,7 +284,7 @@ class CommentPagesTests(TestCase):
         """Неавторизованный пользователь не может комментировать посты."""
         form_data = {
             'text': 'коммент2',
-            'author': self.author,
+            'author': self.user,
             'post': self.post,
         }
         self.guest_client.post(
@@ -298,17 +297,17 @@ class CommentPagesTests(TestCase):
         )
         self.assertNotEqual(
             Comment.objects.count(),
-            self.comments_count + self.ADDED_ENTRY
+            self.comments + 1
         )
         self.assertFalse(
             Comment.objects.filter(
                 text='коммент2',
-                author=self.author,
+                author=self.user,
                 post=self.post,
             ).exists()
         )
 
-class PostsViewsCacheTest(TestCase):
+class CacheTest(TestCase):
     def setUp(self):
         self.guest_client = Client()
         self.user = User.objects.create_user(username='auth4')
@@ -356,7 +355,7 @@ class FollowTests(TestCase):
         self.follower_client.force_login(self.follower)
         self.not_follower_client.force_login(self.not_follower)
 
-    def test_authorized_client_follow_unfollow(self):
+    def test_authorized_can_follow_unfollow(self):
         """Пользователь может подписываться на других и удалять их из подписок."""
         self.follower_client.get(
             reverse(
@@ -391,13 +390,13 @@ class FollowTests(TestCase):
                 kwargs={'username': self.post.author}
             )
         )
-        response_2 = self.follower_client.get(reverse('posts:follow_index'))
-        response_3 = self.not_follower_client.get(
+        response_1 = self.follower_client.get(reverse('posts:follow_index'))
+        response_2 = self.not_follower_client.get(
             reverse('posts:follow_index')
         )
-        self.assertEqual(response_2.context['page_obj']
+        self.assertEqual(response_1.context['page_obj']
                          .paginator.page(1)
                          .object_list.count(), 2)
-        self.assertEqual(response_3.context['page_obj']
+        self.assertEqual(response_2.context['page_obj']
                          .paginator.page(1)
                          .object_list.count(), 0)
