@@ -33,7 +33,7 @@ class StaticURLTests(TestCase):
     def setUp(self):
         self.guest_client = Client()
         self.authorized_client = Client()
-        self.not_author_client = Client ()
+        self.not_author_client = Client()
         self.authorized_client.force_login(self.user)
         self.not_author_client.force_login(self.not_user)
 

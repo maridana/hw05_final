@@ -50,6 +50,7 @@ class PostModelTest(TestCase):
                 help_text = self.post._meta.get_field(value).help_text
                 self.assertEqual(help_text, expected)
 
+
 class GroupModelTest(TestCase):
     @classmethod
     def setUpClass(cls):
@@ -64,5 +65,3 @@ class GroupModelTest(TestCase):
     def test_group_str(self):
         """Проверка __str__ у group."""
         self.assertEqual(self.group.title, str(self.group))
-
-

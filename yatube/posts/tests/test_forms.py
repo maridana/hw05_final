@@ -64,7 +64,7 @@ class PostFormTests(TestCase):
         self.assertEqual(new_post.group, self.group)
 
     def test_edit_post_group(self):
-        """При отправке формы со стр редактирования поста меняется пост и группа."""
+        """При отправке формы со стр эдита меняются пост и группа."""
         post_id = self.post.id
         old_post = self.post.text
         new_group = Group.objects.create(
@@ -86,8 +86,9 @@ class PostFormTests(TestCase):
         old_group_response = self.authorized_client.get(
             reverse('posts:group_list', args=(self.group.slug,))
         )
-        self.assertEqual (old_group_response.context['page_obj'].paginator.count, 0)
-
+        self.assertEqual(
+            old_group_response.context['page_obj'].paginator.count, 0
+        )
 
     def test_create_post_with_image(self):
         """Создание поста с картинкой."""

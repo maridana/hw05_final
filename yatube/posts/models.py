@@ -85,4 +85,3 @@ class Follow(models.Model):
         related_name='following',
         verbose_name='Автор поста'
     )
-
