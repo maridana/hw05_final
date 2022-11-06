@@ -160,7 +160,7 @@ class TaskPagesTests(TestCase):
                 post_group = object.group.slug
                 with self.subTest(value=value):
                     self.assertEqual(post_group, expected)
-                  
+                 
 
 class PaginatorViewsTest(TestCase):
     @classmethod
