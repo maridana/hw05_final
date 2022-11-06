@@ -8,7 +8,10 @@ User = get_user_model()
 
 
 class Post(models.Model):
-    text = models.TextField(verbose_name='Текст')
+    text = models.TextField(
+        verbose_name='Текст',
+        help_text='Введите текст поста'
+    )
     pub_date = models.DateTimeField(
         auto_now_add=True,
         verbose_name='Дата публикации'
@@ -25,7 +28,8 @@ class Post(models.Model):
         null=True,
         on_delete=models.SET_NULL,
         related_name='posts',
-        verbose_name='Группа'
+        verbose_name='Группа',
+        help_text='Группа поста'
     )
     image = models.ImageField(
         'Картинка',
@@ -82,9 +86,3 @@ class Follow(models.Model):
         verbose_name='Автор поста'
     )
 
-    def you_can_follow(user, author):
-        follow_exists = Follow.objects.filter(
-            author=author,
-            user=user
-        ).exists()
-        return (user != author and not follow_exists)

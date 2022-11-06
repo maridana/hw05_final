@@ -9,7 +9,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 
-from posts.models import Group, Post, Comment, Follow
+from posts.models import Group, Post, Comment, Follow, User
 
 
 User = get_user_model()
@@ -160,7 +160,7 @@ class TaskPagesTests(TestCase):
                 post_group = object.group.slug
                 with self.subTest(value=value):
                     self.assertEqual(post_group, expected)
-
+                    
 
 class PaginatorViewsTest(TestCase):
     @classmethod
@@ -173,12 +173,15 @@ class PaginatorViewsTest(TestCase):
             title=('Тестовая группа'),
             slug='test_slug',
             description='Тестовое описание')
-        for i in range(POST_N):
-            cls.post = Post.objects.create(
-                text='Тестовый текст',
+        cls.posts_list = [
+            Post(
                 author=cls.user,
-                group=Group.objects.get(slug='test_slug'),
+                text=f'Текст {i}',
+                group=cls.group
             )
+            for i in range(POST_N)
+        ]
+        Post.objects.bulk_create(cls.posts_list)
 
     def setUp(self):
         self.authorized_client = Client()
