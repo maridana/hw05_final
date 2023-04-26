@@ -1,3 +1,51 @@
 # hw05_final
 
-[![CI](https://github.com/yandex-praktikum/hw05_final/actions/workflows/python-app.yml/badge.svg?branch=master)](https://github.com/yandex-praktikum/hw05_final/actions/workflows/python-app.yml)
+### Описание проекта
+>>
+Проект социальной сети Yatube. 
+Позволяет публиковать собственные заметки и размещать к ним картинку. Также можно смотреть и комментировать заметки других пользователей,
+подписываться на понравившихся авторов. Написан бэкенд, тесты к нему, созданы шаблоны с css.
+
+### Как запустить проект:
+
+Клонировать репозиторий:
+
+```
+git clone
+```
+
+Перейти в папку hw05_final/
+```
+cd hw05_final
+```
+
+Cоздать и активировать виртуальное окружение:
+
+```
+python -m venv venv
+```
+
+```
+source venv/Scripts/activate
+```
+
+Установить зависимости из файла requirements.txt:
+```
+pip install -r requirements.txt
+```
+Перейти в папку hw05_final/yatube/
+```
+cd yatube/
+```
+
+Создать и запустить миграции
+```
+python manage.py makemigrations
+python manage.py migrate
+```
+
+Запустить локальный сервер
+```
+python manage.py runserver
+```
+Теперь проект будет доступен по адресу http://127.0.0.1:8000/ в браузере.
